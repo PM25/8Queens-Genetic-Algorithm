@@ -1,7 +1,9 @@
 import random
 import heapq
+import matplotlib.pyplot as plt
 
 queen_count = 8
+try_times = 1000000
 
 
 def initial(len, count):
@@ -92,19 +94,32 @@ def initial_best(top_count, population):
 
 
 if(__name__ == "__main__"):
-    top_individuals = initial_best(4, 12)
+    ans_score = (queen_count * (queen_count - 1)) / 2
+    plt.title(str(queen_count) + "-Queens Genetic Alogorithm\n"
+                + "Answer score = " + str(ans_score))
+    plt.ylabel("Fitness score")
+    plt.xlabel("Iter")
 
-    while(True):
+    top_individuals = initial_best(4, 12)
+    plt.scatter([1, 2, 3, 4], [individual[0] for individual in top_individuals])
+
+    for step in range(4, try_times):
         selected_parent = selection(top_individuals, 4)
         children = crossover(selected_parent)
         result_children = mutation(children, 1)
 
         top_individuals.clear()
+        score_avg = 0
         for child in result_children:
             score = fitness(child)
-            print(score)
-            if(score == 28):
+            score_avg = score_avg + score/len(result_children)
+
+            if(score == ans_score):
                 print(child)
+                plt.scatter(step, score)
+                plt.show()
                 exit()
 
             top_individuals.append((score, child))
+        plt.scatter(step, score_avg)
+        plt.pause(0.01)
