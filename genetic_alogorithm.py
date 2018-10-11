@@ -159,3 +159,4 @@ if(__name__ == "__main__"):
             plt.pause(0.01)
         elif((step % 1000) == 0):
             print("Iter times:", step)
+    print("Failed to find solution with", try_times, "times of try QQ")
