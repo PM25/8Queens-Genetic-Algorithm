@@ -7,7 +7,7 @@ queen_count = 8 # Board size and Queen amount
 try_times = 1000000 # Maximum generation of child
 child_amount = 4 # Only work with even number
 initial_population = 12 # Starting population size
-mutate_times = 1
+mutate_times = 1 # How many times to mutate
 static_analysis = True # Static Analysis will cause slow performance
 
 
@@ -145,7 +145,7 @@ if(__name__ == "__main__"):
             score_avg = score_avg + score/len(result_children)
             # Terminate condition
             if(score == ans_score):
-                print("After", step, "of Generations,")
+                print("\nAfter", step, "of Generations,")
                 print("The algorithm found one of the solution!")
                 print("Sequence:", child)
                 if(static_analysis):
@@ -157,3 +157,5 @@ if(__name__ == "__main__"):
         if(static_analysis):
             plt.scatter(step, score_avg)
             plt.pause(0.01)
+        elif((step % 1000) == 0):
+            print("Iter times:", step)
