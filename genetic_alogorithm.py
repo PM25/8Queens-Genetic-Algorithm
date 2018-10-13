@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 # Feel free to mass with argument below
 queen_count = 8 # Board size and Queen amount
 try_times = 1000000 # Maximum generation of child
-child_amount = 4 # Only work with even number
-initial_population = 12 # Starting population size
-mutate_times = 1 # How many times to mutate
+child_amount = 500 # Only work with even number
+initial_population = 1000 # Starting population size
+mutate_probability = 0.1 # The probability to mutate (0 ~ 1)
 static_analysis = True # Static Analysis will cause slow performance
+showinfo_step = 10 # Show information in every fixed step
 
 
 # Randomly generate a population size of {count}
@@ -78,11 +79,10 @@ def crossover(seqs):
 
 # Give a list of sequences and randomly change number
 # More {times} mean mutate more
-def mutation(seqs, times):
+def mutation(seqs):
     for seq in seqs:
-        for step in range(times):
-            pos = random.randint(0, len(seq)-1)
-            seq[pos] = random.randint(0, len(seq)-1)
+        pos = random.randint(0, len(seq)-1)
+        seq[pos] = random.randint(0, len(seq)-1)
 
     return seqs
 
@@ -111,14 +111,18 @@ def initial_best(top_count, population):
 if(__name__ == "__main__"):
     # Calculate the terminate condition (fitness score)
     ans_score = (queen_count * (queen_count - 1)) / 2
+    # Average score in every {showinfo_step} step
+    showinfo_step_score = 0
     # Show information to user
     if(static_analysis):
         plt.title(str(queen_count) + "-Queens Genetic Alogorithm\n"
+                    + "Each generation = " + str(child_amount) + " children\n"
                     + "Answer score = " + str(ans_score))
         plt.ylabel("Fitness score")
-        plt.xlabel("Iter")
+        plt.xlabel("Generations")
     else:
         print(str(queen_count) + "-Queens Genetic Algorithm")
+        print("Each generation = " + str(child_amount) + " children")
         print("Answer score = " + str(ans_score))
         print('-'*10 + '\n')
 
@@ -134,18 +138,19 @@ if(__name__ == "__main__"):
     for step in range(1, try_times):
         selected_parent = selection(top_individuals, child_amount)
         children = crossover(selected_parent)
-        result_children = mutation(children, mutate_times)
+        if(random.random() < mutate_probability):
+            children = mutation(children)
 
         # Replace {top_individuals} with {result_children}
         top_individuals.clear()
         score_avg = 0
-        for child in result_children:
+        for child in children:
             score = fitness(child)
             # Calculate this generation's average score
-            score_avg = score_avg + score/len(result_children)
+            score_avg = score_avg + score/len(children)
             # Terminate condition
             if(score == ans_score):
-                print("\nAfter", step, "of Generations,")
+                print("\nAfter", step, "of Generations (", step*child_amount, "iterations ),")
                 print("The algorithm found one of the solution!")
                 print("Sequence:", child)
                 if(static_analysis):
@@ -156,7 +161,12 @@ if(__name__ == "__main__"):
             top_individuals.append((score, child))
         if(static_analysis):
             plt.scatter(step, score_avg)
-            plt.pause(0.01)
-        elif((step % 1000) == 0):
-            print("Iter times:", step)
+            plt.pause(0.05)
+        else:
+            # Calculate every {showinfo_step} step's average score
+            showinfo_step_score += score_avg / showinfo_step
+            # Print information in every {showinfo_step} step
+            if((step % showinfo_step) == 0):
+                print("Generations:", step, "| Iterations:", step*child_amount, "| Average score:", round(showinfo_step_score, 2))
+                showinfo_step_score = 0
     print("Failed to find solution with", try_times, "times of try QQ")
