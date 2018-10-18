@@ -7,7 +7,7 @@ queen_count = 8 # Board size and Queen amount
 try_times = 1000000 # Maximum generation of child
 child_amount = 500 # Only work with even number
 initial_population = 1000 # Starting population size
-mutate_probability = 0.1 # The probability to mutate (0 ~ 1)
+mutate_probability = 0.05 # The probability to mutate (0 ~ 1)
 static_analysis = True # Static Analysis will cause slow performance
 showinfo_step = 10 # Show information in every fixed step
 
@@ -81,8 +81,9 @@ def crossover(seqs):
 # More {times} mean mutate more
 def mutation(seqs):
     for seq in seqs:
-        pos = random.randint(0, len(seq)-1)
-        seq[pos] = random.randint(0, len(seq)-1)
+        if(random.random() < mutate_probability):
+            pos = random.randint(0, len(seq)-1)
+            seq[pos] = random.randint(0, len(seq)-1)
 
     return seqs
 
@@ -138,8 +139,7 @@ if(__name__ == "__main__"):
     for step in range(1, try_times):
         selected_parent = selection(top_individuals, child_amount)
         children = crossover(selected_parent)
-        if(random.random() < mutate_probability):
-            children = mutation(children)
+        children = mutation(children)
 
         # Replace {top_individuals} with {result_children}
         top_individuals.clear()
